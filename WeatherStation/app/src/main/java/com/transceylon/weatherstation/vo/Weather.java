@@ -1,15 +1,17 @@
 package com.transceylon.weatherstation.vo;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by shanukagayashan on 6/20/17.
  */
 
 public class Weather {
-
+    @SerializedName("humidity")
     private String humidity;
-
+    @SerializedName("temparature_celcius")
     private String temparature_celcius;
-
+    @SerializedName("temparature_fahrenheit")
     private String temparature_fahrenheit;
 
     public String getHumidity ()

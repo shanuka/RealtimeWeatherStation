@@ -2,12 +2,20 @@ package com.transceylon.weatherstation;
 
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.transceylon.weatherstation.vo.Weather;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -20,6 +28,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.lang.reflect.Type;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -32,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     final String subscriptionTopic = "dht11";
     final String publishTopic = "exampleAndroidPublishTopic";
     final String publishMessage = "Hello World!";
+    TextView textView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        textView = (TextView) findViewById(R.id.textView);
 
         clientId = clientId + System.currentTimeMillis();
 
@@ -87,11 +98,6 @@ public class MainActivity extends AppCompatActivity {
         mqttConnectOptions.setCleanSession(false);
 
 
-
-
-
-
-
         try {
             //addToHistory("Connecting to " + serverUri);
             mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
@@ -113,14 +119,16 @@ public class MainActivity extends AppCompatActivity {
             });
 
 
-        } catch (MqttException ex){
+        } catch (MqttException ex) {
             ex.printStackTrace();
         }
 
     }
 
-    private void addToHistory(String mainText){
+    private void addToHistory(String mainText) {
         System.out.println("LOG: " + mainText);
+
+
     }
 
     @Override
@@ -142,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void subscribeToTopic(){
+    public void subscribeToTopic() {
         try {
             mqttAndroidClient.subscribe(subscriptionTopic, 0, null, new IMqttActionListener() {
                 @Override
@@ -159,26 +167,45 @@ public class MainActivity extends AppCompatActivity {
             // THIS DOES NOT WORK!
             mqttAndroidClient.subscribe(subscriptionTopic, 0, new IMqttMessageListener() {
                 @Override
-                public void messageArrived(String topic, MqttMessage message) throws Exception {
+                public void messageArrived(String topic, final MqttMessage message) throws Exception {
                     // message Arrived!
                     System.out.println("Message: " + topic + " : " + new String(message.getPayload()));
+                    try {
+
+
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Gson gson = new Gson();
+                                Type type = new TypeToken<Weather>() {
+                                }.getType();
+                                // Code here will run in UI thread
+                                Weather mWeather = gson.fromJson(new String(message.getPayload()), type);
+                                textView.setText("Humidity " + mWeather.getHumidity() + "\nTemparature F " + mWeather.getTemparature_fahrenheit() + "\nTemparature Celcius " + mWeather.getTemparature_celcius());
+
+                            }
+                        });
+
+                    } catch (Exception e) {
+                        Log.d("Exception ", "" + e);
+                    }
                 }
             });
 
-        } catch (MqttException ex){
+        } catch (MqttException ex) {
             System.err.println("Exception whilst subscribing");
             ex.printStackTrace();
         }
     }
 
-    public void publishMessage(){
+    public void publishMessage() {
 
         try {
             MqttMessage message = new MqttMessage();
             message.setPayload(publishMessage.getBytes());
             mqttAndroidClient.publish(publishTopic, message);
             addToHistory("Message Published");
-            if(!mqttAndroidClient.isConnected()){
+            if (!mqttAndroidClient.isConnected()) {
                 addToHistory(mqttAndroidClient.getBufferedMessageCount() + " messages in buffer.");
             }
         } catch (MqttException e) {
