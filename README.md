@@ -1,5 +1,5 @@
 # Realtime Weather Station
-Adruino , Mqtt, Mosquitto , Nodemcu, dht11
+Adruino , Mqtt, Mosquitto , Nodemcu, dht11 , esp8266
 
 https://gist.github.com/igrr/7f7e7973366fc01d6393 // pulish code
  
