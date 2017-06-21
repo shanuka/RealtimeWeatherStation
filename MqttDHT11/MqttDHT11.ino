@@ -11,8 +11,8 @@
 #define DHTTYPE DHT11   // DHT 11
  
 // Connect to the WiFi
-const char* ssid = "Shanuka-WiFi";
-const char* password = "Wasana@#$s";
+const char* ssid = "1234445";
+const char* password = "223223";
 const char* mqtt_server = "192.168.1.4";
  
 WiFiClient espClient;
