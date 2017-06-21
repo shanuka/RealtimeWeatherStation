@@ -9,4 +9,4 @@ https://simplifiedthinking.co.uk/2015/10/03/install-mqtt-server/
 
 
 
-[![Youtube](https://www.youtube.com/watch?v=ot8ZTpsdeJM/0.jpg)](https://www.youtube.com/watch?v=ot8ZTpsdeJM)
+[![Youtube](https://i.ytimg.com/vi/ot8ZTpsdeJM/1.jp)](https://www.youtube.com/watch?v=ot8ZTpsdeJM)
